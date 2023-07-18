@@ -1,0 +1,98 @@
+### register and get auth token
+GET http://[::1]:3000/books/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "email@not-already-used.de",
+  "password": "ValidPassword1!",
+  "firstname": "first",
+  "lastname": "last",
+  "termsConfirmed": true,
+  "conditionsConfirmed": true
+}
+> {% client.global.set("auth_token", response.body.token); %}
+
+### login and get auth_token
+POST localhost:8000/ackerpause/api/v1/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "anbauplaner@acker.co",
+  "password": "anbauplaner"
+}
+> {% client.global.set("auth_token", response.body.token); %}
+
+### mark task as done
+### params: taskId
+POST localhost:8000/ackerpause/api/v1/task/525692/completion
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### subscribe to bed
+### params: bedId
+PUT localhost:8000/ackerpause/api/v1/bed/31809/subscription
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+{
+  "subscription" : true
+}
+
+### unsubscribe from bed
+### params: bedId
+PUT localhost:8000/ackerpause/api/v1/bed/31809/subscription
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+{
+  "subscription" : false
+}
+
+### get bed list
+GET localhost:8000/ackerpause/api/v1/bed
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### get bed details
+### params: bedId
+GET localhost:8000/ackerpause/api/v1/bed/31809
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### get single article
+### params: articleId
+GET localhost:8000/ackerpause/api/v1/article/1
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### get articles/categories/bestOf by type
+GET localhost:8000/ackerpause/api/v1/article?type=recipe
+#GET localhost:8000/ackerpause/api/v1/article?type=know-how
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### get field count
+GET localhost:8000/ackerpause/api/v1/field/count
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### subscribe to company/field via code
+POST localhost:8000/ackerpause/api/v1/field/code
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "code": "Ackern2021"
+}
+
+### unsubcribe from all companies/fields
+DELETE localhost:8000/ackerpause/api/v1/field/connection
+Authorization: Bearer {{auth_token}}
+Accept: application/json
