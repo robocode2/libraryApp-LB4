@@ -10,6 +10,13 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
 import { BaseUserRepository } from './repositories';
+import {AuthenticationComponent} from '@loopback/authentication';
+import {
+  JWTAuthenticationComponent,
+  UserServiceBindings,
+} from '@loopback/authentication-jwt';
+import { LibraryAppDb } from './datasources';
+import { MyUserService } from './services/MyUserService';
 
 export {ApplicationConfig};
 
@@ -19,8 +26,23 @@ export class LibraryApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
-    this.repository(BaseUserRepository);
-    
+      // Mount authentication system
+      this.component(AuthenticationComponent);
+      // Mount jwt component
+      this.component(JWTAuthenticationComponent);
+      // Bind datasource
+      this.dataSource(LibraryAppDb, UserServiceBindings.DATASOURCE_NAME);
+
+        //Bind repository
+        this.repository(BaseUserRepository);
+        // Bind user service
+        this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService),
+        // Bind user and credentials repository
+        this.bind(UserServiceBindings.USER_REPOSITORY).toClass(
+        BaseUserRepository,
+        )
+  
+      
     // Set up the custom sequence
     this.sequence(MySequence);
 
