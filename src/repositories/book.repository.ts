@@ -1,25 +1,25 @@
 import {Getter, inject, injectable} from '@loopback/core';
 import {createHasManyRepositoryFactory, DefaultTransactionalRepository, HasManyDefinition, HasManyRepositoryFactory, HasManyThroughRepositoryFactory} from '@loopback/repository';
 import {LibraryAppDb} from '../datasources';
-import {OrmBook, OrmBookRelations, OrmEntry, OrmList} from '../models';
+import {Book, OrmBookRelations, Entry, List} from '../models';
 import { Base } from './keys';
-import { BaseEntryRepository } from './orm-entry.repository';
-import { BaseListRepository } from './orm-list.repository';
+import { BaseEntryRepository } from './entry.repository';
+import { BaseListRepository } from './list.repository';
 
 @injectable({ tags: { key: Base.Repository.BOOK } })
 export class BaseBookRepository extends DefaultTransactionalRepository<
-  OrmBook,
-  typeof OrmBook.prototype.id,
+  Book,
+  typeof Book.prototype.id,
   OrmBookRelations
 > {
 
   //public readonly user: BelongsToAccessor<OrmUser, typeof OrmUser.prototype.id>;
-  public readonly entries: HasManyRepositoryFactory<OrmEntry, typeof OrmEntry.prototype.id>;
+  public readonly entries: HasManyRepositoryFactory<Entry, typeof Entry.prototype.id>;
   public readonly lists: HasManyThroughRepositoryFactory<
-  OrmList,
-  typeof OrmList.prototype.id,
-  OrmEntry,
-  typeof OrmEntry.prototype.id
+  List,
+  typeof List.prototype.id,
+  Entry,
+  typeof Entry.prototype.id
 >;
 
 
@@ -29,7 +29,7 @@ export class BaseBookRepository extends DefaultTransactionalRepository<
     @inject.getter(Base.Repository.ENTRY) entryRepositoryGetter: Getter<BaseEntryRepository>,
     @inject.getter(Base.Repository.LIST) listRepositoryGetter: Getter<BaseListRepository>
   ) {
-    super(OrmBook, dataSource);
+    super(Book, dataSource);
 
     const entriesMeta = this.entityClass.definition.relations['entries'];
     this.entries = createHasManyRepositoryFactory(

@@ -2,20 +2,20 @@ import {Getter, inject, injectable} from '@loopback/core';
 import {BelongsToAccessor, BelongsToDefinition, createBelongsToAccessor, createHasManyRepositoryFactory, DefaultTransactionalRepository, HasManyDefinition, HasManyRepositoryFactory, HasManyThroughRepositoryFactory} from '@loopback/repository';
 import { BaseBookRepository, BaseEntryRepository } from '.';
 import {LibraryAppDb} from '../datasources';
-import {OrmBook, OrmEntry, OrmList, OrmListRelations, OrmUser} from '../models';
+import {Book, Entry, List, OrmListRelations, User} from '../models';
 import { Base } from './keys';
-import { BaseUserRepository } from './orm-user.repository';
+import { BaseUserRepository } from './user.repository';
 
 @injectable({ tags: { key: Base.Repository.LIST } })
 export class BaseListRepository extends DefaultTransactionalRepository<
-  OrmList,
-  typeof OrmList.prototype.id,
+  List,
+  typeof List.prototype.id,
   OrmListRelations
 > {
 
-  public readonly user: BelongsToAccessor<OrmUser, typeof OrmUser.prototype.id>;
-  public readonly entries: HasManyRepositoryFactory<OrmEntry, typeof OrmEntry.prototype.id>;
-  public readonly books: HasManyThroughRepositoryFactory<OrmBook, typeof OrmBook.prototype.id, OrmEntry, typeof OrmEntry.prototype.id>;
+  public readonly user: BelongsToAccessor<User, typeof User.prototype.id>;
+  public readonly entries: HasManyRepositoryFactory<Entry, typeof Entry.prototype.id>;
+  public readonly books: HasManyThroughRepositoryFactory<Book, typeof Book.prototype.id, Entry, typeof Entry.prototype.id>;
 
   constructor(
     @inject('datasources.libraryApp') dataSource: LibraryAppDb,
@@ -23,12 +23,7 @@ export class BaseListRepository extends DefaultTransactionalRepository<
     @inject.getter(Base.Repository.ENTRY) entryRepositoryGetter: Getter<BaseEntryRepository>,
     @inject.getter(Base.Repository.BOOK) bookRepositoryGetter: Getter<BaseBookRepository>
   ) {
-    super(OrmList, dataSource);
-
-
-    const userMeta = this.entityClass.definition.relations['user'];
-    this.user = createBelongsToAccessor(userMeta as BelongsToDefinition, userRepositoryGetter, this);
-    this.registerInclusionResolver('user', this.user.inclusionResolver);
+    super(List, dataSource);
 
     const entriesMeta = this.entityClass.definition.relations['entries'];
     this.entries = createHasManyRepositoryFactory(
