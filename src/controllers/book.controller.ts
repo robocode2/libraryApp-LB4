@@ -1,10 +1,10 @@
+import { authenticate } from '@loopback/authentication';
 import { inject, injectable } from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
-  repository,
   Where,
 } from '@loopback/repository';
 import {
@@ -18,12 +18,13 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {OrmBook} from '../models';
+import {Book} from '../models';
 import {BaseBookRepository} from '../repositories';
 import { Base } from '../repositories/keys';
 
 @injectable({ tags: { name: 'CreateBookController' } })
-export class CreateBookControllerController {
+@authenticate('jwt')
+export class BookController {
   constructor(
     @inject(Base.Repository.BOOK) private baseBookRepository: BaseBookRepository,
   ) {}
@@ -31,21 +32,21 @@ export class CreateBookControllerController {
   @post('/books')
   @response(200, {
     description: 'OrmBook model instance',
-    content: {'application/json': {schema: getModelSchemaRef(OrmBook)}},
+    content: {'application/json': {schema: getModelSchemaRef(Book)}},
   })
   async create(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(OrmBook, {
+          schema: getModelSchemaRef(Book, {
             title: 'NewOrmBook',
             
           }),
         },
       },
     })
-    ormBook: OrmBook,
-  ): Promise<OrmBook> {
+    ormBook: Book,
+  ): Promise<Book> {
     return this.baseBookRepository.create(ormBook);
   }
 
@@ -55,7 +56,7 @@ export class CreateBookControllerController {
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
-    @param.where(OrmBook) where?: Where<OrmBook>,
+    @param.where(Book) where?: Where<Book>,
   ): Promise<Count> {
     return this.baseBookRepository.count(where);
   }
@@ -67,14 +68,14 @@ export class CreateBookControllerController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(OrmBook, {includeRelations: true}),
+          items: getModelSchemaRef(Book, {includeRelations: true}),
         },
       },
     },
   })
   async find(
-    @param.filter(OrmBook) filter?: Filter<OrmBook>,
-  ): Promise<OrmBook[]> {
+    @param.filter(Book) filter?: Filter<Book>,
+  ): Promise<Book[]> {
     console.log('here bin ich')
     return this.baseBookRepository.find(filter);
   }
@@ -88,12 +89,12 @@ export class CreateBookControllerController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(OrmBook, {partial: true}),
+          schema: getModelSchemaRef(Book, {partial: true}),
         },
       },
     })
-    ormBook: OrmBook,
-    @param.where(OrmBook) where?: Where<OrmBook>,
+    ormBook: Book,
+    @param.where(Book) where?: Where<Book>,
   ): Promise<Count> {
     return this.baseBookRepository.updateAll(ormBook, where);
   }
@@ -103,14 +104,14 @@ export class CreateBookControllerController {
     description: 'OrmBook model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(OrmBook, {includeRelations: true}),
+        schema: getModelSchemaRef(Book, {includeRelations: true}),
       },
     },
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(OrmBook, {exclude: 'where'}) filter?: FilterExcludingWhere<OrmBook>
-  ): Promise<OrmBook> {
+    @param.filter(Book, {exclude: 'where'}) filter?: FilterExcludingWhere<Book>
+  ): Promise<Book> {
     return this.baseBookRepository.findById(id, filter);
   }
 
@@ -123,11 +124,11 @@ export class CreateBookControllerController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(OrmBook, {partial: true}),
+          schema: getModelSchemaRef(Book, {partial: true}),
         },
       },
     })
-    ormBook: OrmBook,
+    ormBook: Book,
   ): Promise<void> {
     await this.baseBookRepository.updateById(id, ormBook);
   }
@@ -138,7 +139,7 @@ export class CreateBookControllerController {
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() ormBook: OrmBook,
+    @requestBody() ormBook: Book,
   ): Promise<void> {
     await this.baseBookRepository.replaceById(id, ormBook);
   }

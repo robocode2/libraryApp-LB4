@@ -1,152 +1,160 @@
+import { authenticate, TokenService } from '@loopback/authentication';
+import { TokenServiceBindings, UserServiceBindings, Credentials } from '@loopback/authentication-jwt';
 import { inject, injectable } from '@loopback/core';
 import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
+  model,
+  property,
 } from '@loopback/repository';
 import {
   post,
-  param,
   get,
   getModelSchemaRef,
-  patch,
-  put,
-  del,
   requestBody,
-  response,
+  SchemaObject,
 } from '@loopback/rest';
-import {OrmUser} from '../models';
+import { SecurityBindings, securityId, UserProfile } from '@loopback/security';
+import _ from 'lodash';
+import {User} from '../models';
 import {BaseUserRepository} from '../repositories';
 import { Base } from '../repositories/keys';
+import {genSalt, hash} from 'bcryptjs';
+import { MyUserService } from '../services/MyUserService';
+
+@model()
+export class NewUserRequest extends User {
+  @property({
+    type: 'string',
+    required: true,
+  })
+  password: string;
+}
+
+const CredentialsSchema: SchemaObject = {
+  type: 'object',
+  required: ['email', 'password'],
+  properties: {
+    email: {
+      type: 'string',
+      format: 'email', //TOOD interesting
+    },
+    password: {
+      type: 'string',
+      minLength: 8,
+    },
+  },
+};
+
+export const CredentialsRequestBody = {
+  description: 'The input of login function',
+  required: true,
+  content: {
+    'application/json': {schema: CredentialsSchema},
+  },
+};
+
+
 
 @injectable({ tags: { name: 'CreateUserController' } })
-export class CreateUserControllerController {
+export class CreateUserController {
   constructor(
+    @inject(TokenServiceBindings.TOKEN_SERVICE)
+    public jwtService: TokenService,
+    @inject(UserServiceBindings.USER_SERVICE)
+    public userService: MyUserService,
+    @inject(SecurityBindings.USER, {optional: true})
+    public user: UserProfile,
     @inject(Base.Repository.USER) private baseUserRepository: BaseUserRepository,
   ) {}
 
-  @post('/users')
-  @response(200, {
-    description: 'OrmUser model instance',
-    content: {'application/json': {schema: getModelSchemaRef(OrmUser)}},
+
+  @post('/users/login', {
+    responses: {
+      '200': {
+        description: 'Token',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                token: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
-  async create(
+  async login(
+    @requestBody(CredentialsRequestBody) credentials: Credentials,
+  ): Promise<{token: string}> {
+    // ensure the user exists, and the password is correct
+    const user = await this.userService.verifyCredentials(credentials);
+    // convert a User object into a UserProfile object (reduced set of properties)
+    const userProfile = this.userService.convertToUserProfile(user);
+    // create a JSON Web Token based on the user profile
+    const token = await this.jwtService.generateToken(userProfile);
+
+    return {token};
+  }
+
+  @authenticate('jwt')
+  @get('/whoAmI', {
+    responses: {
+      '200': {
+        description: 'Return current user',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  })
+  async whoAmI(
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
+  ): Promise<string> {
+    return currentUserProfile[securityId];
+  }
+
+  @post('/signup', {
+    responses: {
+      '200': {
+        description: 'User',
+        content: {
+          'application/json': {
+            schema: {
+              'x-ts-type': User,
+            },
+          },
+        },
+      },
+    },
+  })
+  async signUp(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(OrmUser, {
-            title: 'NewOrmUser',
-            
+          schema: getModelSchemaRef(NewUserRequest, {
+            title: 'NewUser',
           }),
         },
       },
     })
-    ormUser: OrmUser,
-  ): Promise<OrmUser> {
-    return this.baseUserRepository.create(ormUser);
-  }
-
-  @get('/users/count')
-  @response(200, {
-    description: 'OrmUser model count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async count(
-    @param.where(OrmUser) where?: Where<OrmUser>,
-  ): Promise<Count> {
-    return this.baseUserRepository.count(where);
-  }
-
-  @get('/users')
-  @response(200, {
-    description: 'Array of OrmUser model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(OrmUser, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async find(
-    @param.filter(OrmUser) filter?: Filter<OrmUser>,
-  ): Promise<OrmUser[]> {
-    return this.baseUserRepository.find(filter);
-  }
-
-  @patch('/users')
-  @response(200, {
-    description: 'OrmUser PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(OrmUser, {partial: true}),
-        },
-      },
-    })
-    ormUser: OrmUser,
-    @param.where(OrmUser) where?: Where<OrmUser>,
-  ): Promise<Count> {
-    return this.baseUserRepository.updateAll(ormUser, where);
-  }
-
-  @get('/users/{id}')
-  @response(200, {
-    description: 'OrmUser model instance',
-    content: {
-      'application/json': {
-        schema: getModelSchemaRef(OrmUser, {includeRelations: true}),
-      },
-    },
-  })
-  async findById(
-    @param.path.number('id') id: number,
-    @param.filter(OrmUser, {exclude: 'where'}) filter?: FilterExcludingWhere<OrmUser>
-  ): Promise<OrmUser> {
-    return this.baseUserRepository.findById(id, filter);
-  }
-
-  @patch('/users/{id}')
-  @response(204, {
-    description: 'OrmUser PATCH success',
-  })
-  async updateById(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(OrmUser, {partial: true}),
-        },
-      },
-    })
-    ormUser: OrmUser,
-  ): Promise<void> {
-    await this.baseUserRepository.updateById(id, ormUser);
-  }
-
-  @put('/users/{id}')
-  @response(204, {
-    description: 'OrmUser PUT success',
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() ormUser: OrmUser,
-  ): Promise<void> {
-    await this.baseUserRepository.replaceById(id, ormUser);
-  }
-
-  @del('/users/{id}')
-  @response(204, {
-    description: 'OrmUser DELETE success',
-  })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.baseUserRepository.deleteById(id);
+    newUserRequest: NewUserRequest,
+  ): Promise<User> {
+    const password = await hash(newUserRequest.password, await genSalt());
+    const userWithHashedPassword = {
+      ..._.omit(newUserRequest, 'password'),
+      password: password,
+    };
+    const savedUser = await this.baseUserRepository.create(
+      userWithHashedPassword    );
+      
+    return savedUser;
   }
 }
