@@ -1,13 +1,13 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
-import { OrmEntry, OrmEntryWithRelations } from './orm-entry.model';
-import { OrmList, OrmListWithRelations } from './orm-list.model';
-import { OrmUser, OrmUserWithRelations } from './orm-user.model'; //TODO do I want a creator ?
+import { Entry, OrmEntryWithRelations } from './entry.model';
+import { List, OrmListWithRelations } from './list.model';
+import { User, OrmUserWithRelations } from './user.model'; //TODO do I want a creator ?
 
 @model({
   settings: {strict: true, postgresql: {table: 'book'}},
 })
 //TODO mysql?
-export class OrmBook extends Entity {
+export class Book extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -34,20 +34,20 @@ export class OrmBook extends Entity {
   })
   isbn?: string;
 
-  @hasMany(() => OrmEntry, { keyTo: 'bookId' })
-  entries?: OrmEntry[];
+  @hasMany(() => Entry, { keyTo: 'bookId' })
+  entries?: Entry[];
 
-  @hasMany(() => OrmList, {
+  @hasMany(() => List, {
     through: {
-      model: () => OrmEntry,
+      model: () => Entry,
       keyFrom: 'id',
       keyTo: 'bookId'
     }
   })
-  lists?: OrmList[];
+  lists?: List[];
   
 
-  constructor(data?: Partial<OrmBook>) {
+  constructor(data?: Partial<Book>) {
     super(data);
   }
 }
@@ -59,5 +59,5 @@ export class OrmBook extends Entity {
     entries?: OrmEntryWithRelations[];
 
   }
-  export type OrmBookWithRelations = OrmBook & OrmBookRelations;
+  export type OrmBookWithRelations = Book & OrmBookRelations;
 

@@ -1,11 +1,11 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {OrmBook, OrmBookWithRelations} from './orm-book.model';
-import {OrmList, OrmListWithRelations} from './orm-list.model';
+import {Book, OrmBookWithRelations} from './book.model';
+import {List, OrmListWithRelations} from './list.model';
 
 @model({
   settings: {strict: true, postgresql: {table: 'entry'}},
 })
-export class OrmEntry extends Entity {
+export class Entry extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -14,7 +14,7 @@ export class OrmEntry extends Entity {
   id: number;
 
   @belongsTo(
-    () => OrmBook,
+    () => Book,
     {},
     {
       name: 'bookId',
@@ -24,7 +24,7 @@ export class OrmEntry extends Entity {
   bookId: number;
 
   @belongsTo(
-    () => OrmList,
+    () => List,
     {},
     {
       name: 'listId',
@@ -33,7 +33,7 @@ export class OrmEntry extends Entity {
   )
   listId: number;
 
-  constructor(data?: Partial<OrmEntry>) {
+  constructor(data?: Partial<Entry>) {
     super(data);
   }
 }
@@ -43,6 +43,6 @@ export class OrmEntry extends Entity {
     book?: OrmBookWithRelations;
     list?: OrmListWithRelations;
   }
-  export type OrmEntryWithRelations = OrmEntry & OrmEntryRelations;
+  export type OrmEntryWithRelations = Entry & OrmEntryRelations;
 
 

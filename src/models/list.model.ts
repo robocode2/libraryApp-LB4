@@ -1,12 +1,12 @@
 import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import { OrmBook, OrmBookWithRelations } from './orm-book.model';
-import { OrmEntry, OrmEntryWithRelations } from './orm-entry.model';
-import { OrmUser, OrmUserWithRelations } from './orm-user.model';
+import { Book, OrmBookWithRelations } from './book.model';
+import { Entry, OrmEntryWithRelations } from './entry.model';
+import { User, OrmUserWithRelations } from './user.model';
 
 @model({
   settings: {strict: true, postgresql: {table: 'list'}},
 })
-export class OrmList extends Entity {
+export class List extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -27,31 +27,31 @@ export class OrmList extends Entity {
   description?: string;
 
   @belongsTo(
-    () => OrmUser,
+    () => User,
     {},
     {
       name: 'userId',
       required: true
     },
   )
-  userId: number;
+  userId: string;
 
 
-@hasMany(() => OrmEntry, { keyTo: 'listId' })
-entries?: OrmEntry[];
+@hasMany(() => Entry, { keyTo: 'listId' })
+entries?: Entry[];
 
 
-@hasMany(() => OrmBook, {
+@hasMany(() => Book, {
   through: {
-    model: () => OrmEntry,
+    model: () => Entry,
     keyFrom: 'id',
     keyTo: 'listId'
   }
 })
-books?: OrmBook[];
+books?: Book[];
 
 
-  constructor(data?: Partial<OrmList>) {
+  constructor(data?: Partial<List>) {
     super(data);
   }
 }
@@ -61,8 +61,7 @@ books?: OrmBook[];
     // describe navigational properties here
     books?: OrmBookWithRelations[];
     entries?: OrmEntryWithRelations[];
-    user?: OrmUserWithRelations[]
   }
-  export type OrmListWithRelations = OrmList & OrmListRelations;
+  export type OrmListWithRelations = List & OrmListRelations;
 
 
