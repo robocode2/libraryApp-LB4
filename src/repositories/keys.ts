@@ -1,8 +1,8 @@
 import { BindingKey } from "@loopback/core";
-import { BaseBookRepository } from "./orm-book.repository";
-import { BaseEntryRepository } from "./orm-entry.repository";
-import { BaseListRepository } from "./orm-list.repository";
-import { BaseUserRepository } from "./orm-user.repository";
+import { BaseBookRepository } from "./book.repository";
+import { BaseEntryRepository } from "./entry.repository";
+import { BaseListRepository } from "./list.repository";
+import { BaseUserRepository } from "./user.repository";
 
 export namespace Base {
     export namespace Repository {
