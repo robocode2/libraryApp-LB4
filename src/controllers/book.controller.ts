@@ -1,18 +1,14 @@
 import { authenticate } from '@loopback/authentication';
 import { inject, injectable } from '@loopback/core';
 import {
-  Count,
-  CountSchema,
   Filter,
   FilterExcludingWhere,
-  Where,
 } from '@loopback/repository';
 import {
   post,
   param,
   get,
   getModelSchemaRef,
-  patch,
   put,
   del,
   requestBody,
@@ -22,7 +18,8 @@ import {Book} from '../models';
 import {BaseBookRepository} from '../repositories';
 import { Base } from '../repositories/keys';
 
-@injectable({ tags: { name: 'CreateBookController' } })
+
+@injectable({ tags: { name: 'BookController' } }) //TODO why are my controllers injectable ?
 @authenticate('jwt')
 export class BookController {
   constructor(
@@ -31,7 +28,7 @@ export class BookController {
 
   @post('/books')
   @response(200, {
-    description: 'OrmBook model instance',
+    description: 'Book model instance',
     content: {'application/json': {schema: getModelSchemaRef(Book)}},
   })
   async create(
@@ -39,31 +36,20 @@ export class BookController {
       content: {
         'application/json': {
           schema: getModelSchemaRef(Book, {
-            title: 'NewOrmBook',
+            title: 'NewBook',
             
           }),
         },
       },
     })
-    ormBook: Book,
+    book: Book,
   ): Promise<Book> {
-    return this.baseBookRepository.create(ormBook);
-  }
-
-  @get('/books/count')
-  @response(200, {
-    description: 'OrmBook model count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async count(
-    @param.where(Book) where?: Where<Book>,
-  ): Promise<Count> {
-    return this.baseBookRepository.count(where);
+    return this.baseBookRepository.create(book);
   }
 
   @get('/books')
   @response(200, {
-    description: 'Array of OrmBook model instances',
+    description: 'Array of Book model instances',
     content: {
       'application/json': {
         schema: {
@@ -76,32 +62,13 @@ export class BookController {
   async find(
     @param.filter(Book) filter?: Filter<Book>,
   ): Promise<Book[]> {
-    console.log('here bin ich')
     return this.baseBookRepository.find(filter);
   }
 
-  @patch('/books')
-  @response(200, {
-    description: 'OrmBook PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Book, {partial: true}),
-        },
-      },
-    })
-    ormBook: Book,
-    @param.where(Book) where?: Where<Book>,
-  ): Promise<Count> {
-    return this.baseBookRepository.updateAll(ormBook, where);
-  }
 
   @get('/books/{id}')
   @response(200, {
-    description: 'OrmBook model instance',
+    description: 'Book model instance',
     content: {
       'application/json': {
         schema: getModelSchemaRef(Book, {includeRelations: true}),
@@ -115,38 +82,20 @@ export class BookController {
     return this.baseBookRepository.findById(id, filter);
   }
 
-  @patch('/books/{id}')
-  @response(204, {
-    description: 'OrmBook PATCH success',
-  })
-  async updateById(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Book, {partial: true}),
-        },
-      },
-    })
-    ormBook: Book,
-  ): Promise<void> {
-    await this.baseBookRepository.updateById(id, ormBook);
-  }
-
   @put('/books/{id}')
   @response(204, {
-    description: 'OrmBook PUT success',
+    description: 'Book PUT success',
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() ormBook: Book,
+    @requestBody() book: Book,
   ): Promise<void> {
-    await this.baseBookRepository.replaceById(id, ormBook);
+    await this.baseBookRepository.replaceById(id, book);
   }
 
-  @del('/books/{id}')
+  @del('/books/{id}') //TODO dangerous
   @response(204, {
-    description: 'OrmBook DELETE success',
+    description: 'Book DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.baseBookRepository.deleteById(id);

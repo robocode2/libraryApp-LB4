@@ -3,7 +3,7 @@ import {ApplicationConfig, LibraryApplication} from './application';
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new LibraryApplication(options);
+  const app = new LibraryApplication(options);  
   await app.boot();
   await app.start();
 

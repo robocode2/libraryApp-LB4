@@ -54,8 +54,8 @@ export const CredentialsRequestBody = {
 
 
 
-@injectable({ tags: { name: 'CreateUserController' } })
-export class CreateUserController {
+@injectable({ tags: { name: 'UserController' } })
+export class UserController {
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: TokenService,

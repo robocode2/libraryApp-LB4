@@ -4,19 +4,19 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "username": "rabia 21",
+  "username": "User 2",
   "password": "totally!",
-  "email": "rabiabbas471@gmail.com"
+  "email": "user2@gmail.com"
 }
 
-### login
+### login and get auth_token
 POST http://[::1]:3000/users/login
 Content-Type: application/json
 Accept: application/json
 
 {
   "password": "totally!",
-  "email": "rabiabbas471@gmail.com"
+  "email": "user2@gmail.com"
 }
 > {% client.global.set("auth_token", response.body.token); %}
 
@@ -27,8 +27,69 @@ Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
+
+### CREATE BOOK
+POST http://[::1]:3000/books
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "title": "My First Book",
+  "description": "my first book description",
+  "isbn": "123141"
+}
+
 ### GET BOOK
 GET http://[::1]:3000/books/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+
+### CREATE LIST
+POST http://[::1]:3000/lists
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "User 2 list",
+  "description": "my first list description"
+}
+
+### GET LIST
+GET http://[::1]:3000/lists/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### DELETE LIST
+DELETE http://[::1]:3000/lists/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### CREATE ENTRY
+POST http://[::1]:3000/lists/1/entries
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "bookId": 1,
+  "listId": 1
+}
+
+### DELETE ENTRY
+DELETE http://[::1]:3000/lists/1/entries/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+
+### GET ENTRIES
+GET http://[::1]:3000/lists/1/entries
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
