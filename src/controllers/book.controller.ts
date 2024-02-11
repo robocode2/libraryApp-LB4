@@ -1,31 +1,34 @@
-import { authenticate } from '@loopback/authentication';
-import { inject, injectable } from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject, injectable} from '@loopback/core';
 import {
   Filter,
   FilterExcludingWhere,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
+import {Role} from '../auth/domain/models';
 import {Book} from '../models';
 import {BaseBookRepository} from '../repositories';
-import { Base } from '../repositories/keys';
+import {Base} from '../repositories/keys';
 
 
-@injectable({ tags: { name: 'BookController' } }) //TODO why are my controllers injectable ?
+@injectable({tags: {name: 'BookController'}}) //TODO why are my controllers injectable ?
 @authenticate('jwt')
 export class BookController {
   constructor(
     @inject(Base.Repository.BOOK) private baseBookRepository: BaseBookRepository,
-  ) {}
+  ) { }
 
+  @authorize({allowedRoles: [Role.ADMIN]})
   @post('/books')
   @response(200, {
     description: 'Book model instance',
@@ -37,7 +40,7 @@ export class BookController {
         'application/json': {
           schema: getModelSchemaRef(Book, {
             title: 'NewBook',
-            
+
           }),
         },
       },

@@ -1,28 +1,28 @@
-import { authenticate } from '@loopback/authentication';
-import { authorize } from '@loopback/authorization';
-import { inject, injectable } from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject, injectable} from '@loopback/core';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
-  del,
+  param,
+  post,
   requestBody,
   response,
 } from '@loopback/rest';
-import { Auth } from '../auth/keys';
+import {Auth} from '../auth/keys';
 import {Entry} from '../models';
 import {BaseEntryRepository} from '../repositories';
-import { Base } from '../repositories/keys';
+import {Base} from '../repositories/keys';
 
-@injectable({ tags: { name: 'EntryController' } })
+@injectable({tags: {name: 'EntryController'}})
 @authenticate('jwt')
 export class EntryController {
   constructor(
     @inject(Base.Repository.ENTRY) private entryRepository: BaseEntryRepository,
-  ) {}
+  ) { }
 
-  @authorize({ voters: [Auth.Provider.OWN_LIST_ONLY] })
+  @authorize({voters: [Auth.Voter.OWN_LIST_ONLY]})
   @post('/lists/{listId}/entries')
   @response(200, {
     description: 'Entry model instance',
@@ -41,23 +41,23 @@ export class EntryController {
     return this.entryRepository.create(entry);
   }
 
-  @authorize({ voters: [Auth.Provider.OWN_LIST_ONLY] })
+  @authorize({voters: [Auth.Voter.OWN_LIST_ONLY]})
   @get('lists/{listId}/entries')
   @response(200)
   async getListEntries(
     @param.path.number('listId') listId: number,
   ): Promise<Entry[]> {
-    const filter = {where: {listId} }
+    const filter = {where: {listId}}
     return this.entryRepository.find(filter);
   }
 
-  @authorize({ voters: [Auth.Provider.OWN_LIST_ONLY] })
+  @authorize({voters: [Auth.Voter.OWN_LIST_ONLY]})
   @del('lists/{listId}/entries/{id}')
   @response(204)
   async findById(
     @param.path.number('listId') listId: number, //TODO I dont like that it's not being used. But it is. Can I improve?
     @param.path.number('id') id: number,
   ): Promise<void> {
-     await this.entryRepository.deleteById(id);
+    await this.entryRepository.deleteById(id);
   }
 }

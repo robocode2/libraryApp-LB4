@@ -3,7 +3,7 @@ import {
   JWTAuthenticationComponent,
   UserServiceBindings,
 } from '@loopback/authentication-jwt';
-import {AuthorizationBindings, AuthorizationComponent, AuthorizationDecision, AuthorizationOptions} from '@loopback/authorization';
+import {AuthorizationBindings, AuthorizationComponent, AuthorizationDecision, AuthorizationOptions, AuthorizationTags} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
@@ -14,8 +14,9 @@ import {
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import {OwnListOnlyUseCase} from './auth/application/useCases';
-import {ListAccessService} from './auth/domain/services';
-import {OwnListOnlyVoter} from './auth/infrastructure/providers/OwnListVoter';
+import {AuthorizationService, ListAccessService} from './auth/domain/services';
+import {AuthorizationProvider} from './auth/infrastructure/providers';
+import {OwnListOnlyVoter} from './auth/infrastructure/voters/OwnListVoter';
 import {Auth} from './auth/keys';
 import {LibraryAppDb} from './datasources';
 import {BaseUserRepository} from './repositories';
@@ -53,11 +54,15 @@ export class LibraryApplication extends BootMixin(
     };
 
     // Mount auth
+    // I remember simething about the order of these bindings or the above bindings being essential
     this.component(AuthorizationComponent);
     this.configure(AuthorizationBindings.COMPONENT).to(authOptions);
+    this.bind('auth.services.authorization').toClass(AuthorizationService);
+    this.bind(Auth.Provider.AUTHORIZATION_PROVIDER).toProvider(AuthorizationProvider).tag(AuthorizationTags.AUTHORIZER);
+
     this.bind('auth.useCases.ownListOnly').toClass(OwnListOnlyUseCase);
     this.bind('auth.services.listAccess').toClass(ListAccessService);
-    this.bind(Auth.Provider.OWN_LIST_ONLY).toProvider(OwnListOnlyVoter);
+    this.bind(Auth.Voter.OWN_LIST_ONLY).toProvider(OwnListOnlyVoter);
 
 
     // Set up the custom sequence

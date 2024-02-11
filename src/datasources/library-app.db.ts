@@ -7,7 +7,7 @@ const mainConfig = {
   connector: 'postgresql',
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-  url: process.env.DB_DEV_URL, //TODOX this was the key
+  url: 'postgres://postgres:IDnowLOV123@127.0.0.1:5432/libraryapp_dev', //TODOX this was the key
   user: process.env.DB_USER,
   password: process.env.DB_PASSWD,
   database: process.env.DB_DEV_SCHEMA
