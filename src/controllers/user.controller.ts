@@ -1,24 +1,24 @@
-import { authenticate, TokenService } from '@loopback/authentication';
-import { TokenServiceBindings, UserServiceBindings, Credentials } from '@loopback/authentication-jwt';
-import { inject, injectable } from '@loopback/core';
+import {authenticate, TokenService} from '@loopback/authentication';
+import {Credentials, TokenServiceBindings, UserServiceBindings} from '@loopback/authentication-jwt';
+import {inject, injectable} from '@loopback/core';
 import {
   model,
   property,
 } from '@loopback/repository';
 import {
-  post,
   get,
   getModelSchemaRef,
+  post,
   requestBody,
   SchemaObject,
 } from '@loopback/rest';
-import { SecurityBindings, securityId, UserProfile } from '@loopback/security';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
 import {User} from '../models';
 import {BaseUserRepository} from '../repositories';
-import { Base } from '../repositories/keys';
-import {genSalt, hash} from 'bcryptjs';
-import { MyUserService } from '../services/MyUserService';
+import {Base} from '../repositories/keys';
+import {MyUserService} from '../services/MyUserService';
 
 @model()
 export class NewUserRequest extends User {
@@ -54,7 +54,7 @@ export const CredentialsRequestBody = {
 
 
 
-@injectable({ tags: { name: 'UserController' } })
+@injectable({tags: {name: 'UserController'}})
 export class UserController {
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE)
@@ -64,7 +64,7 @@ export class UserController {
     @inject(SecurityBindings.USER, {optional: true})
     public user: UserProfile,
     @inject(Base.Repository.USER) private baseUserRepository: BaseUserRepository,
-  ) {}
+  ) { }
 
 
   @post('/users/login', {
@@ -89,13 +89,9 @@ export class UserController {
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{token: string}> {
-    // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
-    // convert a User object into a UserProfile object (reduced set of properties)
     const userProfile = this.userService.convertToUserProfile(user);
-    // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
-
     return {token};
   }
 
@@ -153,8 +149,8 @@ export class UserController {
       password: password,
     };
     const savedUser = await this.baseUserRepository.create(
-      userWithHashedPassword    );
-      
+      userWithHashedPassword);
+
     return savedUser;
   }
 }
