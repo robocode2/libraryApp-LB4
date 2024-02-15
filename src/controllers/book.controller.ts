@@ -85,6 +85,7 @@ export class BookController {
     return this.baseBookRepository.findById(id, filter);
   }
 
+  @authorize({allowedRoles: [Role.ADMIN]})
   @put('/books/{id}')
   @response(204, {
     description: 'Book PUT success',
@@ -96,11 +97,13 @@ export class BookController {
     await this.baseBookRepository.replaceById(id, book);
   }
 
-  @del('/books/{id}') //TODO dangerous
+  @authorize({allowedRoles: [Role.ADMIN]})
+  @del('/books/{id}')
   @response(204, {
     description: 'Book DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
+    // TODOx delete all entries including this book
     await this.baseBookRepository.deleteById(id);
   }
 }
