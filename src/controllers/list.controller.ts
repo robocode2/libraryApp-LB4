@@ -28,7 +28,7 @@ export class ListController {
     @inject(Base.Repository.ENTRY) private entryRepository: BaseEntryRepository
   ) { }
 
-  @post('/lists')
+  @post('/lists') //TODO introduce a cap on user requests though. In books and entries as well.
   async create(
     @inject(SecurityBindings.USER)
     currentUserProfile: UserProfile,

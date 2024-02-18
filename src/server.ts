@@ -1,11 +1,15 @@
 require('dotenv').config();
 import {ApplicationConfig} from '@loopback/core';
 
+import {ExtraErrorData} from '@sentry/integrations';
+import * as Sentry from '@sentry/node';
 import {once} from 'events';
 import express from 'express';
 import http from 'http';
 import {AddressInfo} from 'net';
 import {LibraryApplication} from './application';
+import {ErrorHandler} from './infrastructure/errorHandling/errorHandler';
+
 
 const compression = require('compression');
 const cors = require('cors');
@@ -28,13 +32,16 @@ export class ExpressServer {
   public readonly lbApp: LibraryApplication;
   private server?: http.Server;
   public url: String;
+  private errorHandler = new ErrorHandler();
+
 
   constructor(options: ApplicationConfig = {}) {
     this.app = express();
     this.lbApp = new LibraryApplication(options);
     this.initBasicExpressSetup();
     this.initBodyParser();
-
+    this.initErrorHandling();
+    this.initSentryLogging();
     this.initLb4RequestHandler();
   }
 
@@ -55,7 +62,26 @@ export class ExpressServer {
 
 
 
+  private initSentryLogging() {
+    if (process.env.SENTRY_DSN) {
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        environment: NODE_ENV,
+        integrations: [new ExtraErrorData()]
+      });
+      this.app.use(Sentry.Handlers.requestHandler() as express.RequestHandler);
+    }
+  }
 
+  private initErrorHandling() {
+    this.app.use(this.errorHandler.handle.bind(this.errorHandler));
+
+    // errors not caught by express => caught by node events
+    process.on('unhandledRejection', (unhandledRejection) => {
+      throw unhandledRejection; // converted to uncaughtException
+    });
+    // node uncaughtException event triggers Sentry fatal error logging + server shutdown
+  }
 
 
   private initBodyParser() {
@@ -76,13 +102,13 @@ export class ExpressServer {
 
 
   public async boot() {
-     
+
     console.log('lb4: boot ...');
     await this.lbApp.boot();
   }
 
   public async start() {
-     
+
     console.log('lb4: starting cultivation-planning ...');
     await this.lbApp.start();
     const port = this.lbApp.restServer.config.port || 3000;
