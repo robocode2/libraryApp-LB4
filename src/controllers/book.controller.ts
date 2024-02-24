@@ -8,76 +8,46 @@ import {
 import {
   del,
   get,
-  getModelSchemaRef,
   param,
   post,
   put,
-  requestBody,
-  response,
+  requestBody
 } from '@loopback/rest';
 import {Role} from '../auth/domain/models';
 import {Book} from '../models';
-import {BaseBookRepository} from '../repositories';
+import {BaseBookRepository, BaseEntryRepository} from '../repositories';
 import {Base} from '../repositories/keys';
+import {bookSchema} from '../schemas';
 
 
-@injectable({tags: {name: 'BookController'}}) //TODO why are my controllers injectable ?
+@injectable({tags: {name: 'BookController'}})
 @authenticate('jwt')
 export class BookController {
   constructor(
     @inject(Base.Repository.BOOK) private baseBookRepository: BaseBookRepository,
+    @inject(Base.Repository.ENTRY) private baseEntryRepository: BaseEntryRepository,
+
   ) { }
+
 
   @authorize({allowedRoles: [Role.ADMIN]})
   @post('/books')
-  @response(200, {
-    description: 'Book model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Book)}},
-  })
   async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Book, {
-            title: 'NewBook',
-
-          }),
-        },
-      },
-    })
-    book: Book,
+    @requestBody() request: any,
   ): Promise<Book> {
-    return this.baseBookRepository.create(book);
+    const data = await bookSchema.validateAsync(request);
+    return this.baseBookRepository.create(data);
   }
 
+
   @get('/books')
-  @response(200, {
-    description: 'Array of Book model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Book, {includeRelations: true}),
-        },
-      },
-    },
-  })
   async find(
     @param.filter(Book) filter?: Filter<Book>,
   ): Promise<Book[]> {
     return this.baseBookRepository.find(filter);
   }
 
-
   @get('/books/{id}')
-  @response(200, {
-    description: 'Book model instance',
-    content: {
-      'application/json': {
-        schema: getModelSchemaRef(Book, {includeRelations: true}),
-      },
-    },
-  })
   async findById(
     @param.path.number('id') id: number,
     @param.filter(Book, {exclude: 'where'}) filter?: FilterExcludingWhere<Book>
@@ -87,23 +57,18 @@ export class BookController {
 
   @authorize({allowedRoles: [Role.ADMIN]})
   @put('/books/{id}')
-  @response(204, {
-    description: 'Book PUT success',
-  })
-  async replaceById(
+  async update(
     @param.path.number('id') id: number,
-    @requestBody() book: Book,
+    @requestBody() request: any,
   ): Promise<void> {
-    await this.baseBookRepository.replaceById(id, book);
+    const data = await bookSchema.validateAsync(request);
+    await this.baseBookRepository.replaceById(id, data);
   }
 
   @authorize({allowedRoles: [Role.ADMIN]})
   @del('/books/{id}')
-  @response(204, {
-    description: 'Book DELETE success',
-  })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
-    // TODOx delete all entries including this book
+    await this.baseEntryRepository.deleteAll({bookId: id});
     await this.baseBookRepository.deleteById(id);
   }
 }
