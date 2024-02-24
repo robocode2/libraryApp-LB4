@@ -7,7 +7,7 @@ import {AuthorizationBindings, AuthorizationComponent, AuthorizationDecision, Au
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
+import {RestApplication, RestBindings} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -19,6 +19,9 @@ import {AuthorizationProvider} from './auth/infrastructure/providers';
 import {OwnListOnlyVoter} from './auth/infrastructure/voters/OwnListVoter';
 import {Auth} from './auth/keys';
 import {LibraryAppDb} from './datasources';
+import {CustomRejectProvider} from './infrastructure/errorHandling';
+import {ErrorHandler} from './infrastructure/errorHandling/errorHandler';
+import {Shared} from './infrastructure/keys';
 import {BaseUserRepository} from './repositories';
 import {MySequence} from './sequence';
 import {MyUserService} from './services/MyUserService';
@@ -64,6 +67,9 @@ export class LibraryApplication extends BootMixin(
     this.bind('auth.services.listAccess').toClass(ListAccessService);
     this.bind(Auth.Voter.OWN_LIST_ONLY).toProvider(OwnListOnlyVoter);
 
+
+    this.bind(RestBindings.SequenceActions.REJECT).toProvider(CustomRejectProvider);
+    this.bind(Shared.Service.ERROR_HANDLER).toClass(ErrorHandler);
 
     // Set up the custom sequence
     this.sequence(MySequence);

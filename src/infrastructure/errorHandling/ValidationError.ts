@@ -5,7 +5,6 @@ export interface IDetail {
   type: Type;
 }
 
-
 enum Type {
   DUPLICATE = 'duplicate',
   NOT_FOUND = 'not_found',

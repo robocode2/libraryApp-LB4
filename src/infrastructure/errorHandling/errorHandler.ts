@@ -1,20 +1,16 @@
 import {ErrorWriterOptions} from '@loopback/rest';
-import * as Sentry from '@sentry/node';
 import {NextFunction, Request, Response} from 'express';
 import {HttpError} from 'http-errors';
 import {ValidationError} from 'joi';
 import StrongErrorHandler from 'strong-error-handler';
-import {logger} from '../logger';
-import {IDetail} from './IDetail';
+import {logger} from '../logging/logger';
 import {RequestType, getRequestType} from './requestType';
 import {mapCodeToStatusCode} from './statusCodeMapping';
-
 
 const strongErrorHandlerOptions = {
   debug: process.env.NODE_ENV === 'development',
   safeFields: ['details', 'errorCode']
 };
-const ERROR_SHUTDOWN_TIMEOUT = parseInt(process.env.ERROR_SHUTDOWN_TIMEOUT ?? '1000', 10);
 
 export interface IErrorHandler {
   handle(error: Error, req: Request, res: Response, next: NextFunction): void;
@@ -64,11 +60,6 @@ export class ErrorHandler implements IErrorHandler {
   private async handleInternalServerError(err: Error, url: string, requestType: RequestType) {
     logger.error(`Server error on route ${url} with request type ${requestType}:`);
     logger.error(err);
-
-    Sentry.captureException(err);
-    await Sentry.close(ERROR_SHUTDOWN_TIMEOUT).finally(() => {
-      process.exit(1);
-    });
   }
 
   private writeErrorToResponse(
@@ -120,34 +111,9 @@ export class ErrorHandler implements IErrorHandler {
 
   captureAsWarning(error: Error | ValidationError): void {
     logger.warn(error);
-    Sentry.withScope(function (scope) {
-      scope.setLevel('warning');
-
-      if ((error as ValidationError).details) {
-        scope.setExtra('details', (error as ValidationError).details);
-      }
-
-      Sentry.captureException(error);
-    });
   }
 
   capture(error: unknown): void {
     logger.error(error);
-
-    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-      if (!process.env.SENTRY_DSN) {
-        return;
-      }
-    }
-
-    Sentry.withScope(function (scope) {
-      scope.setLevel('error');
-
-      if ((error as {details: IDetail<unknown>[]}).details) {
-        scope.setExtra('details', (error as {details: IDetail<unknown>[]}).details);
-      }
-
-      Sentry.captureException(error);
-    });
   }
 }
