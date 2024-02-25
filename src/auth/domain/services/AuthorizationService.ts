@@ -12,20 +12,11 @@ export interface IAuthorizationService {
 export class AuthorizationService implements IAuthorizationService {
   constructor() { }
 
-  private fulfillsRoleRequirements(role: Role, allowedRoles: string[]): boolean {
-    return _.includes(allowedRoles, role);
-  }
-
-
-
   public authorize(user: User, allowedRoles: string[]): boolean {
-    const role: Role = user.role; //TODOX! wrong. no roles here. need to overwrite the user profile model.
-
-    if (!user || !allowedRoles.length) {
-      return false;
+    if (!allowedRoles.length) {
+      return true;
     }
-
-    console.log(this.fulfillsRoleRequirements(role, allowedRoles))
-    return this.fulfillsRoleRequirements(role, allowedRoles);
+    const role: Role = user.role;
+    return _.includes(allowedRoles, role)
   }
 }

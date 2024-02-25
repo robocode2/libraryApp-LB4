@@ -45,7 +45,7 @@ export class ListController {
     @param.path.number('listId') listId: number,
     @param.filter(List, {exclude: 'where'}) filter?: FilterExcludingWhere<List>
   ): Promise<List> {
-    const listExists = await this.entryRepository.exists(listId);
+    const listExists = await this.listRepository.exists(listId);
     if (!listExists) {
       throw new HttpErrors.NotFound('List not found');
     }
@@ -57,7 +57,7 @@ export class ListController {
   async deleteById(
     @param.path.number('listId') listId: number
   ): Promise<void> {
-    const listExists = await this.entryRepository.exists(listId);
+    const listExists = await this.listRepository.exists(listId);
     if (!listExists) {
       throw new HttpErrors.NotFound('List not found');
     }

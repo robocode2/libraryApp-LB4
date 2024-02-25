@@ -6,6 +6,7 @@ import {
   FilterExcludingWhere,
 } from '@loopback/repository';
 import {
+  HttpErrors,
   del,
   get,
   param,
@@ -52,6 +53,10 @@ export class BookController {
     @param.path.number('id') id: number,
     @param.filter(Book, {exclude: 'where'}) filter?: FilterExcludingWhere<Book>
   ): Promise<Book> {
+    const bookExists = await this.baseBookRepository.exists(id);
+    if (!bookExists) {
+      throw new HttpErrors.NotFound('List not found');
+    }
     return this.baseBookRepository.findById(id, filter);
   }
 
@@ -61,6 +66,10 @@ export class BookController {
     @param.path.number('id') id: number,
     @requestBody() request: any,
   ): Promise<void> {
+    const bookExists = await this.baseBookRepository.exists(id);
+    if (!bookExists) {
+      throw new HttpErrors.NotFound('List not found');
+    }
     const data = await bookSchema.validateAsync(request);
     await this.baseBookRepository.replaceById(id, data);
   }
@@ -68,6 +77,10 @@ export class BookController {
   @authorize({allowedRoles: [Role.ADMIN]})
   @del('/books/{id}')
   async deleteById(@param.path.number('id') id: number): Promise<void> {
+    const bookExists = await this.baseBookRepository.exists(id);
+    if (!bookExists) {
+      throw new HttpErrors.NotFound('List not found');
+    }
     await this.baseEntryRepository.deleteAll({bookId: id});
     await this.baseBookRepository.deleteById(id);
   }

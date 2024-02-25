@@ -23,7 +23,7 @@ export class AuthorizationProvider implements Provider<Authorizer> {
   }
 
   async authorize(context: AuthorizationContext, metadata: AuthorizationMetadata) {
-    const userProfile: UserProfile | undefined = context.principals[0] as UserProfile; ///TODOx missing ROles. How does it automatically contain roles in CultivationPlanning ?
+    const userProfile: UserProfile | undefined = context.principals[0] as UserProfile;
 
     const user = await this.userRepo.findById(userProfile.id)
     const allowedRoles: string[] = metadata.allowedRoles ?? [];
