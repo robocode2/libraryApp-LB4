@@ -3,7 +3,7 @@ import {Book, Entry, List} from '../../../models';
 
 export class ListBuilder {
   private values: Partial<List> = {
-    name: 'My first list',
+    name: 'Test list',
     description: 'my favourites books',
     userId: 'FaAMohHFTwftFrApJnjcEt640k92',
   };
@@ -12,9 +12,13 @@ export class ListBuilder {
   private entries?: Entry[];
   private books?: Book[];
 
-  build(): List {
-    const ormList = new List(this.values);
 
-    return ormList;
+  withUserId(value?: string): this {
+    this.values.userId = value;
+    return this;
+  }
+
+  build(): List {
+    return new List(this.values);
   }
 }

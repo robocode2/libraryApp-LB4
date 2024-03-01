@@ -13,6 +13,10 @@ export class ListPopulator {
     this.application = application;
   }
 
+  withUserId(value: string): this {
+    this.listBuilder.withUserId(value);
+    return this;
+  }
 
   async populate(): Promise<OrmListWithRelations> {
     const ormList = this.listBuilder.build();

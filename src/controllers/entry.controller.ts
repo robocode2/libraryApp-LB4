@@ -11,7 +11,7 @@ import {
 } from '@loopback/rest';
 import {Auth} from '../auth/keys';
 import {Entry} from '../models';
-import {BaseEntryRepository} from '../repositories';
+import {BaseEntryRepository, BaseListRepository} from '../repositories';
 import {Base} from '../repositories/keys';
 import {entrySchema} from '../schemas';
 
@@ -20,10 +20,12 @@ import {entrySchema} from '../schemas';
 export class EntryController {
   constructor(
     @inject(Base.Repository.ENTRY) private entryRepository: BaseEntryRepository,
+    @inject(Base.Repository.LIST) private listRepository: BaseListRepository,
+
   ) { }
 
   async checkListExists(listId: number): Promise<void> {
-    const listExists = await this.entryRepository.exists(listId);
+    const listExists = await this.listRepository.exists(listId);
     if (!listExists) {
       throw new HttpErrors.NotFound('List not found');
     }

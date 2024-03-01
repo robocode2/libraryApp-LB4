@@ -2,15 +2,10 @@ import {authenticate, TokenService} from '@loopback/authentication';
 import {Credentials, TokenServiceBindings, UserServiceBindings} from '@loopback/authentication-jwt';
 import {inject, injectable} from '@loopback/core';
 import {
-  model,
-  property,
-} from '@loopback/repository';
-import {
   get,
-  getModelSchemaRef,
   post,
   requestBody,
-  SchemaObject,
+  SchemaObject
 } from '@loopback/rest';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {genSalt, hash} from 'bcryptjs';
@@ -18,16 +13,9 @@ import _ from 'lodash';
 import {User} from '../models';
 import {BaseUserRepository} from '../repositories';
 import {Base} from '../repositories/keys';
+import {userSchema} from '../schemas';
 import {MyUserService} from '../services/MyUserService';
 
-@model()
-export class NewUserRequest extends User {
-  @property({
-    type: 'string',
-    required: true,
-  })
-  password: string;
-}
 
 const CredentialsSchema: SchemaObject = {
   type: 'object',
@@ -35,7 +23,7 @@ const CredentialsSchema: SchemaObject = {
   properties: {
     email: {
       type: 'string',
-      format: 'email', //TOOD interesting
+      format: 'email',
     },
     password: {
       type: 'string',
@@ -67,25 +55,7 @@ export class UserController {
   ) { }
 
 
-  @post('/users/login', {
-    responses: {
-      '200': {
-        description: 'Token',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                token: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  })
+  @post('/users/login')
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{token: string}> {
@@ -96,20 +66,7 @@ export class UserController {
   }
 
   @authenticate('jwt')
-  @get('/whoAmI', {
-    responses: {
-      '200': {
-        description: 'Return current user',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
-  })
+  @get('/whoAmI')
   async whoAmI(
     @inject(SecurityBindings.USER)
     currentUserProfile: UserProfile,
@@ -117,35 +74,14 @@ export class UserController {
     return currentUserProfile[securityId];
   }
 
-  @post('/signup', {
-    responses: {
-      '200': {
-        description: 'User',
-        content: {
-          'application/json': {
-            schema: {
-              'x-ts-type': User,
-            },
-          },
-        },
-      },
-    },
-  })
+  @post('/signup')
   async signUp(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(NewUserRequest, {
-            title: 'NewUser',
-          }),
-        },
-      },
-    })
-    newUserRequest: NewUserRequest,
+    @requestBody() request: any,
   ): Promise<User> {
-    const password = await hash(newUserRequest.password, await genSalt());
+    const requestData = await userSchema.validateAsync(request);
+    const password = await hash(requestData.password, await genSalt());
     const userWithHashedPassword = {
-      ..._.omit(newUserRequest, 'password'),
+      ..._.omit(requestData, 'password'),
       password: password,
     };
     const savedUser = await this.baseUserRepository.create(
