@@ -13,6 +13,7 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
+import {RateLimiterComponent} from 'loopback4-ratelimiter';
 import {OwnListOnlyUseCase} from './auth/application/useCases';
 import {AuthorizationService, ListAccessService} from './auth/domain/services';
 import {AuthorizationProvider} from './auth/infrastructure/providers';
@@ -70,6 +71,9 @@ export class LibraryApplication extends BootMixin(
 
     this.bind(RestBindings.SequenceActions.REJECT).toProvider(CustomRejectProvider);
     this.bind(Shared.Service.ERROR_HANDLER).toClass(ErrorHandler);
+
+
+    this.component(RateLimiterComponent);
 
     // Set up the custom sequence
     this.sequence(MySequence);
