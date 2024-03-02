@@ -4,7 +4,7 @@ import {userSchema} from '../../../schemas';
 import {expectSchemaValidationFailure} from '../../helpers';
 import {expect} from '../../helpers/test-modules';
 
-describe.only('userSchema', () => {
+describe('userSchema', () => {
   const sandbox = sinon.createSandbox();
   let body: AnyObject;
 
