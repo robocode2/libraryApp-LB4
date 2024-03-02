@@ -11,7 +11,7 @@ import {
 } from '@loopback/rest';
 import {Auth} from '../auth/keys';
 import {Entry} from '../models';
-import {BaseEntryRepository, BaseListRepository} from '../repositories';
+import {BaseBookRepository, BaseEntryRepository, BaseListRepository} from '../repositories';
 import {Base} from '../repositories/keys';
 import {entrySchema} from '../schemas';
 
@@ -21,7 +21,7 @@ export class EntryController {
   constructor(
     @inject(Base.Repository.ENTRY) private entryRepository: BaseEntryRepository,
     @inject(Base.Repository.LIST) private listRepository: BaseListRepository,
-
+    @inject(Base.Repository.BOOK) private bookRepository: BaseBookRepository,
   ) { }
 
   async checkListExists(listId: number): Promise<void> {
@@ -31,14 +31,28 @@ export class EntryController {
     }
   }
 
+  async checkBookExists(bookId: number): Promise<void> {
+    const bookExists = await this.bookRepository.exists(bookId);
+    if (!bookExists) {
+      throw new HttpErrors.NotFound('Book not found');
+    }
+  }
+
   @authorize({voters: [Auth.Voter.OWN_LIST_ONLY]})
   @post('/lists/{listId}/entries')
   async createEntry(
     @param.path.number('listId') listId: number,
     @requestBody() request: any,
   ): Promise<Entry> {
-    await this.checkListExists(listId);
     const data = await entrySchema.validateAsync(request);
+    const existingEntry = await this.entryRepository.findOne({
+      where: {listId, bookId: data.bookId},
+    });
+    if (existingEntry) {
+      throw new Error('Entry with the provided book ID already exists in the list');
+    }
+    await this.checkBookExists(data.bookId);
+    await this.checkListExists(listId);
     return this.entryRepository.create(data);
   }
 
