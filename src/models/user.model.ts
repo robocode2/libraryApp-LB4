@@ -14,25 +14,19 @@ export class User extends Entity {
   })
   id: string;
 
-  /*   @property({
-      type: 'number',
-      id: true,
-      generated: true,
-    })
-    id: number; */
-
   @property({
     type: 'string',
     required: true,
+    index: {
+      unique: true,
+    },
   })
   username: string;
 
-  // must keep it
-  // feat email unique
   @property({
     type: 'string',
     required: true,
-    index: { //TODO read up
+    index: {
       unique: true,
     },
   })
@@ -40,11 +34,11 @@ export class User extends Entity {
 
   @property({
     type: 'string',
-    enum: ['ADMIN', 'USER'], // Define enum for role
+    enum: ['ADMIN', 'USER'],
     required: true,
-    default: 'USER', // Default value is 'USER'
+    default: 'USER',
   })
-  role: Role; // Specify type for role property
+  role: Role;
 
   @property({
     type: 'string',
@@ -55,7 +49,6 @@ export class User extends Entity {
   @hasMany(() => List, {keyTo: 'userId'}) //TODO userId or id ?
   lists?: List[];
 
-  //TODO hasMany books ? Can anyone delete a book entity ?
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,24 +60,8 @@ export class User extends Entity {
 }
 
 export interface OrmUserRelations {
-  // describe navigational properties here
   lists?: OrmListWithRelations[];
-  // credential: UserCredentials;
-  //TODO books ?
 }
 
 export type OrmUserWithRelations = User & OrmUserRelations;
-/*   @property({
-    type: 'boolean',
-  })
-  emailVerified?: boolean;
 
-  @property({
-    type: 'string',
-  })
-  verificationToken?: string; */
-
-/*   @hasOne(() => UserCredentials, { keyTo: 'userId' })
-  userCredential: UserCredentials;
-
- */
