@@ -20,7 +20,7 @@ module.exports = {
       },
       userId: {
         allowNull: false,
-        type: DataTypes.UUID, // xx or UIDV4
+        type: DataTypes.UUID,
         notEmpty: true,
       },
     });

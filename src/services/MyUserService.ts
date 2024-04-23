@@ -4,14 +4,13 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {UserService} from '@loopback/authentication';
-import { inject } from '@loopback/core';
-import {repository} from '@loopback/repository';
+import {inject} from '@loopback/core';
 import {HttpErrors} from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
 import {compare} from 'bcryptjs';
-import { User } from '../models';
-import { BaseUserRepository } from '../repositories';
-import { Base } from '../repositories/keys';
+import {User} from '../models';
+import {BaseUserRepository} from '../repositories';
+import {Base} from '../repositories/keys';
 
 /**
  * A pre-defined type for user credentials. It assumes a user logs in
@@ -25,7 +24,7 @@ export type Credentials = {
 export class MyUserService implements UserService<User, Credentials> {
   constructor(
     @inject(Base.Repository.USER) public userRepository: BaseUserRepository,
-  ) {}
+  ) { }
 
   async verifyCredentials(credentials: Credentials): Promise<User> {
     const invalidCredentialsError = 'Invalid email or password.';
@@ -36,13 +35,6 @@ export class MyUserService implements UserService<User, Credentials> {
     if (!foundUser) {
       throw new HttpErrors.Unauthorized(invalidCredentialsError);
     }
-/* 
-    const credentialsFound = await this.userRepository.findCredentials(
-      foundUser.id,
-    );
-    if (!credentialsFound) {
-      throw new HttpErrors.Unauthorized(invalidCredentialsError);
-    } */
 
     const passwordMatched = await compare(
       credentials.password,
@@ -65,7 +57,6 @@ export class MyUserService implements UserService<User, Credentials> {
     };
   }
 
-  //function to find user by id
   async findUserById(id: string): Promise<User> {
     const userNotfound = 'invalid User';
     const foundUser = await this.userRepository.findOne({

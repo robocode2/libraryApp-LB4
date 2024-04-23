@@ -29,7 +29,7 @@ export class ValidationError extends CustomError {
     ACCESS_NOT_ALLOWED: 'access not allowed',
     MAX_LIMIT: 'maximum limit reached',
     NOT_FOUND: 'not found',
-    INVALID_REQUEST_BODY: 'invalid request body', //TODO must support these
+    INVALID_REQUEST_BODY: 'invalid request body',
     INVALID_REQUEST: 'invalid request',
     NOT_HANDLED: 'not handled',
     REQUIRED: 'required'

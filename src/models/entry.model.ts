@@ -37,12 +37,11 @@ export class Entry extends Entity {
     super(data);
   }
 }
-  //TODOX double check all relations
-  export interface OrmEntryRelations {
-    // describe navigational properties here
-    book?: OrmBookWithRelations;
-    list?: OrmListWithRelations;
-  }
-  export type OrmEntryWithRelations = Entry & OrmEntryRelations;
+export interface OrmEntryRelations {
+  // describe navigational properties here
+  book?: OrmBookWithRelations;
+  list?: OrmListWithRelations;
+}
+export type OrmEntryWithRelations = Entry & OrmEntryRelations;
 
 

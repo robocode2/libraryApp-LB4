@@ -138,9 +138,8 @@ describe('ListController', () => {
         .get(`/lists/${list.id}/entries`)
         .set('Authorization', `Bearer ${normalJwtToken}`);
 
-      expect(response.status).to.equal(403); //TODOX add error, Access denied
+      expect(response.status).to.equal(403);
     });
-    // TODOX case with admin
   });
 
 });

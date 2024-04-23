@@ -46,7 +46,7 @@ export class User extends Entity {
   })
   password: string;
 
-  @hasMany(() => List, {keyTo: 'userId'}) //TODO userId or id ?
+  @hasMany(() => List, {keyTo: 'userId'})
   lists?: List[];
 
 

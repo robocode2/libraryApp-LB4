@@ -58,7 +58,6 @@ export class LibraryApplication extends BootMixin(
     };
 
     // Mount auth
-    // I remember simething about the order of these bindings or the above bindings being essential
     this.component(AuthorizationComponent);
     this.configure(AuthorizationBindings.COMPONENT).to(authOptions);
     this.bind('auth.services.authorization').toClass(AuthorizationService);

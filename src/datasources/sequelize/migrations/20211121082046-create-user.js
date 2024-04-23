@@ -4,8 +4,8 @@ module.exports = {
     await queryInterface.createTable('user', {
       id: {
         allowNull: false,
-        type: DataTypes.UUID, // xx or UIDV4
-        defaultValue: DataTypes.UUIDV4, // I remember a porblem with this
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
       username: {
@@ -22,24 +22,12 @@ module.exports = {
       },
       role: {
         allowNull: false,
-        type: DataTypes.ENUM('ADMIN', 'USER') //TODOX Specify with enum or something
+        type: DataTypes.ENUM('ADMIN', 'USER')
       },
-/*       verificationtoken: { //weird that it has to be burger case
-        //optional
-        type: DataTypes.STRING,
-        allowNull: true, // This allows NULL values
-        defaultValue: null, // This sets the default value to NULL
-      },
-      emailverified: { //weird that it has to be burger case
-        //optional
-        type: DataTypes.BOOLEAN,
-        allowNull: true, // This allows NULL values
-        defaultValue: null, // This sets the default value to NULL
-      }, */
+
     });
   },
   down: async (queryInterface, DataTypes) => {
     await queryInterface.dropTable('user');
   },
 };
-// There are many notes in the LB4 models, please read and manage it till completion

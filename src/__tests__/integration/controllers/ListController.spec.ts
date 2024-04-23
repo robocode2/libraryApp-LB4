@@ -138,10 +138,10 @@ describe('ListController', () => {
         .set('Authorization', `Bearer ${normalJwtToken}`);
 
       console.log(response)
-      expect(response.status).to.equal(403); //TODOX add error, Access denied
+      expect(response.status).to.equal(403);
     });
 
-    it('should reject getting list if it doesnt belong to user as an admin?', async () => { //TODOX jwt malformed :/ ?
+    it('should reject getting list if it doesnt belong to user as an admin?', async () => {
       const list = await new ListPopulator(server.lbApp).withUserId('fc9e6df5-8bbc-444b-be8a-8ee1594b81aa').populate();
 
       const response = await client
