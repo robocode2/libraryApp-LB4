@@ -1,35 +1,35 @@
 ### signup
-POST http://[::1]:3000/signup
+POST http://[::1]:4008/signup
 Content-Type: application/json
 Accept: application/json
 
 {
-  "username": "User 2",
-  "password": "totally!",
+  "username": "User 1",
+  "password": "IDnowLOV123!",
   "email": "user2@gmail.com"
 }
 
 ### login and get auth_token
-POST http://[::1]:3000/users/login
+POST http://[::1]:4008/users/login
 Content-Type: application/json
 Accept: application/json
 
 {
-  "password": "totally!",
+  "password": "IDnowLOV123!",
   "email": "user2@gmail.com"
 }
 > {% client.global.set("auth_token", response.body.token); %}
 
 
 ### whoAmI
-GET http://[::1]:3000/whoAmI
+GET http://[::1]:4008/whoAmI
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
 
 ### CREATE BOOK
-POST http://[::1]:3000/books
+POST http://[::1]:4008/books
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
@@ -40,15 +40,21 @@ Authorization: Bearer {{auth_token}}
   "isbn": "123141"
 }
 
-### GET BOOK
-GET http://[::1]:3000/books/1
+### GET BOOKS
+GET http://[::1]:4008/books
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### DELETE BOOK
+DELETE http://[::1]:4008/books/13
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
 
 ### CREATE LIST
-POST http://[::1]:3000/lists
+POST http://[::1]:4008/lists
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
@@ -59,37 +65,37 @@ Authorization: Bearer {{auth_token}}
 }
 
 ### GET LIST
-GET http://[::1]:3000/lists/1
+GET http://[::1]:4008/lists/1
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
 ### DELETE LIST
-DELETE http://[::1]:3000/lists/1
+DELETE http://[::1]:4008/lists/2
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
 ### CREATE ENTRY
-POST http://[::1]:3000/lists/1/entries
+POST http://[::1]:4008/lists/11/entries
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "bookId": 1,
-  "listId": 1
+  "bookId": 13,
+  "listId": 11
 }
 
 ### DELETE ENTRY
-DELETE http://[::1]:3000/lists/1/entries/1
+DELETE http://[::1]:4008/lists/11/entries/3
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
 
 ### GET ENTRIES
-GET http://[::1]:3000/lists/1/entries
+GET http://[::1]:4008/lists/11/entries
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
