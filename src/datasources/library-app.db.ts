@@ -3,23 +3,23 @@ import {juggler} from '@loopback/repository';
 
 
 const mainConfig = {
-  name: 'libraryapp_dev',
-  connector: 'postgresql',
+  name: process.env.DEV_DB,
+  connector: process.env.DB_CONNECTOR,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-  url: 'postgres://postgres:IDnowLOV123@127.0.0.1:5432/libraryapp_dev', //TODOX this was the key
+  url: process.env.DB_DEV_URL,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWD,
-  database: process.env.DB_DEV_SCHEMA
+  database: process.env.DEV_DB
 };
 
 const testConfig = {
-  name: 'libraryapp_test',
-  connector: 'postgresql',
+  name: process.env.TEST_DB_NAME,
+  connector: process.env.DB_CONNECTOR,
   host: process.env.DB_HOST,
-  database: process.env.DB_TEST_SCHEMA,
+  database: process.env.DB_TEST,
   port: process.env.DB_PORT,
-  url: 'postgres://postgres:IDnowLOV123@127.0.0.1:5432/libraryapp_test',
+  url: process.env.DB_TEST_URL,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWD,
 };
