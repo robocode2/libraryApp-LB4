@@ -42,6 +42,7 @@ export const CredentialsRequestBody = {
 
 
 
+
 @injectable({tags: {name: 'UserController'}})
 export class UserController {
   constructor(
@@ -54,6 +55,12 @@ export class UserController {
     @inject(Base.Repository.USER) private baseUserRepository: BaseUserRepository,
   ) { }
 
+  async checkEmailIsUsed(userEmail: string): Promise<void> {
+    const user = await this.baseUserRepository.findOne({where: {email: userEmail}});
+    if (user) {
+      throw new Error('Error happened. Registering not allowed with this email. Check with admins');
+    }
+  }
 
   @post('/users/login')
   async login(
@@ -79,6 +86,7 @@ export class UserController {
     @requestBody() request: any,
   ): Promise<User> {
     const requestData = await userSchema.validateAsync(request);
+    await this.checkEmailIsUsed(requestData.email);
     const password = await hash(requestData.password, await genSalt());
     const userWithHashedPassword = {
       ..._.omit(requestData, 'password'),
