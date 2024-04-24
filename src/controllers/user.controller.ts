@@ -58,7 +58,14 @@ export class UserController {
   async checkEmailIsUsed(userEmail: string): Promise<void> {
     const user = await this.baseUserRepository.findOne({where: {email: userEmail}});
     if (user) {
-      throw new Error('Error happened. Registering not allowed with this email. Check with admins');
+      throw new Error('Error happened. Registering not allowed with this email or username. Check with admins');
+    }
+  }
+
+  async checkUsernameIsUsed(username: string): Promise<void> {
+    const user = await this.baseUserRepository.findOne({where: {username}});
+    if (user) {
+      throw new Error('Error happened. Registering not allowed with this email or username. Check with admins');
     }
   }
 
@@ -87,6 +94,8 @@ export class UserController {
   ): Promise<User> {
     const requestData = await userSchema.validateAsync(request);
     await this.checkEmailIsUsed(requestData.email);
+    await this.checkUsernameIsUsed(requestData.username);
+
     const password = await hash(requestData.password, await genSalt());
     const userWithHashedPassword = {
       ..._.omit(requestData, 'password'),
