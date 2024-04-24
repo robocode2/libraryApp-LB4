@@ -1,75 +1,40 @@
-# library
+# Your Project Name
 
-This application is generated using [LoopBack 4 CLI](https://loopback.io/doc/en/lb4/Command-line-interface.html) with the
-[initial project layout](https://loopback.io/doc/en/lb4/Loopback-application-layout.html).
+## Installation
 
-## Install dependencies
+1. Clone the repository:
 
-By default, dependencies were installed when this application was generated.
-Whenever dependencies in `package.json` are changed, run the following command:
+    ```bash
+    git clone <repository-url>
+    ```
 
-```sh
-npm install
-```
+2. Install dependencies:
 
-To only install resolved dependencies in `package-lock.json`:
+    ```bash
+    npm install
+    ```
 
-```sh
-npm ci
-```
+3. Comment out the property `userCredentials: UserCredentials` in `node_modules/@loopback/authentication-jwt/dist/models/user.model.d.ts`.
 
-## Run the application
+4. Create two local postgreSQL databases "libraryapp_dev" and "libraryapp_test". 
 
-```sh
-npm start
-```
+5. Add your DB_USER and DB_PASSWORD to the .env.example file provided. 
 
-You can also run `node .` to skip the build step.
+6. Use `.env.example` file in the root directory of your project as your .env file. 
 
-Open http://127.0.0.1:3000 in your browser.
 
-## Rebuild the project
+## Database Setup
 
-To incrementally build the project:
+1. You're set up now. You can always run the following command to reset the development database (ensure you have PostgreSQL installed):
 
-```sh
-npm run build
-```
+    ```bash
+    npm run db:reset
+    ```
 
-To force a full build by cleaning up cached artifacts:
+2. Change `NODE_ENV` in the `.env` file to "test".
 
-```sh
-npm run rebuild
-```
+3. Run the following command again to reset the test database:
 
-## Fix code style and formatting issues
-
-```sh
-npm run lint
-```
-
-To automatically fix such issues:
-
-```sh
-npm run lint:fix
-```
-
-## Other useful commands
-
-- `npm run migrate`: Migrate database schemas for models
-- `npm run openapi-spec`: Generate OpenAPI spec into a file
-- `npm run docker:build`: Build a Docker image for this application
-- `npm run docker:run`: Run this application inside a Docker container
-
-## Tests
-
-```sh
-npm test
-```
-
-## What's next
-
-Please check out [LoopBack 4 documentation](https://loopback.io/doc/en/lb4/) to
-understand how you can continue to add features to this application.
-
-[![LoopBack](https://github.com/loopbackio/loopback-next/raw/master/docs/site/imgs/branding/Powered-by-LoopBack-Badge-(blue)-@2x.png)](http://loopback.io/)
+    ```bash
+    npm run db:reset
+    ```
