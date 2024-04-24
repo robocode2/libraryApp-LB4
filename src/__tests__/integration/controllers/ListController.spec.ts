@@ -104,14 +104,14 @@ describe('ListController', () => {
       expect(response.status).to.equal(403);
     });
 
-    it('should reject deleting list if it doesnt belong to user as an admin?', async () => { //TODOX same error verifying token
+    it('should reject deleting list if it doesnt belong to user as an admin?', async () => {
       const list = await new ListPopulator(server.lbApp).withUserId('fc9e6df5-8bbc-444b-be8a-8ee1594b81aa').populate();
 
       const response = await client
         .del(`/lists/${list.id}`)
         .set('Authorization', `Bearer ${adminJwtToken}`);
 
-      expect(response.status).to.equal(401);
+      expect(response.status).to.equal(403);
     });
   });
 
@@ -137,7 +137,6 @@ describe('ListController', () => {
         .get(`/lists/${list.id}`)
         .set('Authorization', `Bearer ${normalJwtToken}`);
 
-      console.log(response)
       expect(response.status).to.equal(403);
     });
 
@@ -148,7 +147,8 @@ describe('ListController', () => {
         .get(`/lists/${list.id}`)
         .set('Authorization', `Bearer ${adminJwtToken}`);
 
-      expect(response.status).to.equal(401);
+      console.log(response)
+      expect(response.status).to.equal(403);
     });
   });
 

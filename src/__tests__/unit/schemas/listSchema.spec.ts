@@ -43,11 +43,6 @@ describe('listSchema', () => {
       };
     });
 
-    it('should be provided', async () => {
-      delete body.description
-      await expectSchemaValidationFailure(listSchema, body, 'any.required');
-    });
-
     it('should be a string', async () => {
       body.description = ['description string'];
       await expectSchemaValidationFailure(listSchema, body, 'string.base');

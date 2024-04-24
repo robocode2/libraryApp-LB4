@@ -13,25 +13,16 @@ export class CredentialsBuilder {
 
   withUsername(value: string): this {
     this.values.username = value;
-    this.values.email = value;
     return this;
   }
 
   withEmail(value: string): this {
-    this.values.username = value;
     this.values.email = value;
     return this;
   }
 
   withPassword(value: string): this {
     this.values.password = value;
-    return this;
-  }
-
-  asIntegration(): this {
-    this.values.username = 'integration@test.de';
-    this.values.email = 'integration@test.de';
-    this.values.password = 'integration-test';
     return this;
   }
 

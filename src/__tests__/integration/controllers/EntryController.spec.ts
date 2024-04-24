@@ -129,7 +129,7 @@ describe('ListController', () => {
 
     });
 
-    it.only('should reject getting list entries if list doesnt belong to user', async () => {
+    it('should reject getting list entries if list doesnt belong to user', async () => {
       const book = await new BookPopulator(server.lbApp).populate();
       const list = await new ListPopulator(server.lbApp).withUserId(adminUser.id).populate();
       const entry = await new EntryPopulator(server.lbApp).withBookId(book.id).withListId(list.id).populate();

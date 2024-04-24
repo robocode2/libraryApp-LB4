@@ -37,7 +37,7 @@ describe('BookController', () => {
     normalUserCredentials = new CredentialsBuilder().build();
     adminUserCredentials = new CredentialsBuilder()
       .withEmail('admin@test.de')
-      .withUsername(`userCredentials.username` + 'Admin')
+      .withUsername('admin1')
       .build();
     normalUser = await new UserPopulator(server.lbApp)
       .withUsername(normalUserCredentials.username)
