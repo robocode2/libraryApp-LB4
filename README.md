@@ -36,5 +36,14 @@
 3. Run the following command again to reset the test database:
 
     ```bash
+
+
+## Tests 
+
+Tests can be run with 
+
+ ```bash
+    npm run build && npm run test
+    ```
     npm run db:reset
     ```
