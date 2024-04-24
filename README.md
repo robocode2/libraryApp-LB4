@@ -45,5 +45,3 @@ Tests can be run with
  ```bash
     npm run build && npm run test
     ```
-    npm run db:reset
-    ```
