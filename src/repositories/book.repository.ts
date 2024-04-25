@@ -1,5 +1,5 @@
 import {Getter, inject, injectable} from '@loopback/core';
-import {DefaultTransactionalRepository, HasManyDefinition, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, createHasManyRepositoryFactory} from '@loopback/repository';
+import {DefaultTransactionalRepository, Filter, HasManyDefinition, HasManyRepositoryFactory, HasManyThroughRepositoryFactory, createHasManyRepositoryFactory} from '@loopback/repository';
 import {LibraryAppDb} from '../datasources';
 import {Book, Entry, List, OrmBookRelations} from '../models';
 import {BaseEntryRepository} from './entry.repository';
@@ -44,8 +44,18 @@ export class BaseBookRepository extends DefaultTransactionalRepository<
     this.registerInclusionResolver('lists', this.lists.inclusionResolver);
 
 
+
   }
 
+  async searchByTitle(title: string): Promise<Book[]> {
+    // Use parameterized query to prevent SQL injection
+    const filter: Filter<Book> = {
+      where: {
+        title: {like: `%${title}%`}
+      }
+    };
+    return this.find(filter);
+  }
 
 
 }

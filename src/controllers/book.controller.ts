@@ -20,7 +20,6 @@ import {BaseBookRepository, BaseEntryRepository} from '../repositories';
 import {Base} from '../repositories/keys';
 import {bookSchema} from '../schemas';
 
-
 @injectable({tags: {name: 'BookController'}})
 @authenticate('jwt')
 export class BookController {
@@ -83,5 +82,16 @@ export class BookController {
     }
     await this.baseEntryRepository.deleteAll({bookId: id});
     await this.baseBookRepository.deleteById(id);
+  }
+
+  @get('/books/search')
+  async search(
+    @requestBody() request: any,
+  ): Promise<Book[]> {
+    const {title} = request;
+    if (!title) {
+      throw new HttpErrors.BadRequest('Title parameter is required');
+    }
+    return this.baseBookRepository.searchByTitle(title);
   }
 }

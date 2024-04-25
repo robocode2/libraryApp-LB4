@@ -6,7 +6,7 @@ Accept: application/json
 {
   "username": "User 1",
   "password": "IDnowLOV123!",
-  "email": "user2@gmail.com"
+  "email": "user1@gmail.com"
 }
 
 ### login and get auth_token
@@ -16,7 +16,7 @@ Accept: application/json
 
 {
   "password": "IDnowLOV123!",
-  "email": "user2@gmail.com"
+  "email": "user1@gmail.com"
 }
 > {% client.global.set("auth_token", response.body.token); %}
 
@@ -52,6 +52,15 @@ Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
+### SEARCH BOOK
+GET http://[::1]:4008/books/search
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "title": "Jane"
+}
 
 ### CREATE LIST
 POST http://[::1]:4008/lists
